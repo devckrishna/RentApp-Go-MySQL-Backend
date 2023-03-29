@@ -29,6 +29,9 @@ func main() {
 	server.Use(gin.Logger())
 	routes.UserRoutes(server)
 	routes.PropertyRoutes(server)
+	routes.ReviewRoutes(server)
+	routes.RequestRoutes(server)
+	routes.SavedRoutes(server)
 
 	server.POST("/api/upload", imageUpload)
 

@@ -11,4 +11,5 @@ func PropertyRoutes(ctx *gin.Engine) {
 	ctx.GET("/property/:id", controllers.GetPropertyById)
 	ctx.GET("/property/toprated", controllers.GetTopRatedProperties)
 	ctx.GET("/property/nearyou/:city", controllers.GetPropertiesNearYou)
+	ctx.GET("/property/hostedbyuser/:id", controllers.GetHostPropertiesByUser)
 }

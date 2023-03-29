@@ -16,8 +16,8 @@ func CreateProperty(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
-	query := "INSERT INTO property (title, owner_id, city, country, total_rooms, total_area, rating, nei_details,price, avy_living_cost, facilities) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-	_, err = db.Exec(query, newProperty.Title, newProperty.Owner_id, newProperty.City, newProperty.Country, newProperty.Total_rooms, newProperty.Total_area, newProperty.Rating, newProperty.Nei_details, newProperty.Price, newProperty.Avg_living_cost, newProperty.Facilities)
+	query := "INSERT INTO property (title, owner_id, city, country, total_rooms, total_area, rating, nei_details,price, avy_living_cost, facilities, rent) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	_, err = db.Exec(query, newProperty.Title, newProperty.Owner_id, newProperty.City, newProperty.Country, newProperty.Total_rooms, newProperty.Total_area, newProperty.Rating, newProperty.Nei_details, newProperty.Price, newProperty.Avg_living_cost, newProperty.Facilities, &newProperty.Rent)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
@@ -41,7 +41,7 @@ func GetAllProperties(c *gin.Context) {
 
 	for res.Next() {
 		var property models.Property
-		err := res.Scan(&property.Id, &property.Title, &property.Owner_id, &property.City, &property.Country, &property.Total_rooms, &property.Total_area, &property.Rating, &property.Nei_details, &property.Price, &property.Avg_living_cost, &property.Facilities)
+		err := res.Scan(&property.Id, &property.Title, &property.Owner_id, &property.City, &property.Country, &property.Total_rooms, &property.Total_area, &property.Rating, &property.Nei_details, &property.Price, &property.Avg_living_cost, &property.Facilities, &property.Rent)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
@@ -62,7 +62,7 @@ func GetPropertyById(c *gin.Context) {
 
 	var property models.Property
 	query := "SELECT * FROM property WHERE id = ?"
-	err = db.QueryRow(query, propertyIdInt).Scan(&property.Id, &property.Title, &property.Owner_id, &property.City, &property.Country, &property.Total_rooms, &property.Total_area, &property.Rating, &property.Nei_details, &property.Price, &property.Avg_living_cost, &property.Facilities)
+	err = db.QueryRow(query, propertyIdInt).Scan(&property.Id, &property.Title, &property.Owner_id, &property.City, &property.Country, &property.Total_rooms, &property.Total_area, &property.Rating, &property.Nei_details, &property.Price, &property.Avg_living_cost, &property.Facilities, &property.Rent)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
@@ -85,7 +85,7 @@ func GetTopRatedProperties(c *gin.Context) {
 
 	for res.Next() {
 		var property models.Property
-		err := res.Scan(&property.Id, &property.Title, &property.Owner_id, &property.City, &property.Country, &property.Total_rooms, &property.Total_area, &property.Rating, &property.Nei_details, &property.Price, &property.Avg_living_cost, &property.Facilities)
+		err := res.Scan(&property.Id, &property.Title, &property.Owner_id, &property.City, &property.Country, &property.Total_rooms, &property.Total_area, &property.Rating, &property.Nei_details, &property.Price, &property.Avg_living_cost, &property.Facilities, &property.Rent)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
@@ -101,10 +101,43 @@ func GetPropertiesNearYou(c *gin.Context) {
 
 	var property models.Property
 	query := `SELECT * FROM property WHERE City = ?`
-	err := db.QueryRow(query, cityName).Scan(&property.Id, &property.Title, &property.Owner_id, &property.City, &property.Country, &property.Total_rooms, &property.Total_area, &property.Rating, &property.Nei_details, &property.Price, &property.Avg_living_cost, &property.Facilities)
+	err := db.QueryRow(query, cityName).Scan(&property.Id, &property.Title, &property.Owner_id, &property.City, &property.Country, &property.Total_rooms, &property.Total_area, &property.Rating, &property.Nei_details, &property.Price, &property.Avg_living_cost, &property.Facilities, &property.Rent)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"property": property})
+}
+
+func GetHostPropertiesByUser(c *gin.Context) {
+	userId := c.Param("id")
+	userId = strings.ReplaceAll(userId, "/", "")
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	query := "SELECT * FROM property WHERE owner_id = ?"
+	res, err := db.Query(query, userIdInt)
+
+	defer res.Close()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	properties := []models.Property{}
+
+	for res.Next() {
+		var property models.Property
+		err := res.Scan(&property.Id, &property.Title, &property.Owner_id, &property.City, &property.Country, &property.Total_rooms, &property.Total_area, &property.Rating, &property.Nei_details, &property.Price, &property.Avg_living_cost, &property.Facilities, &property.Rent)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			return
+		}
+		properties = append(properties, property)
+	}
+	c.JSON(http.StatusOK, gin.H{"properties": properties})
 }

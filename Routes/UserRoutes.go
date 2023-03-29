@@ -13,4 +13,5 @@ func UserRoutes(ctx *gin.Engine) {
 	ctx.POST("/users/login", controllers.LoginUser)
 	ctx.POST("/users/enablehost/:id", controllers.EnableHost)
 	ctx.POST("/users/disablehost/:id", controllers.DisableHost)
+	ctx.POST("/users/update/:id", controllers.UpdateUser)
 }

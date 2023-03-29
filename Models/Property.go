@@ -13,4 +13,5 @@ type Property struct {
 	Price           int
 	Avg_living_cost int
 	Facilities      string
+	Rent            bool
 }

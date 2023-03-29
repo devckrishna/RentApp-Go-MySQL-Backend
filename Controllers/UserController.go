@@ -21,6 +21,14 @@ type LoginRequest struct {
 	Password string
 }
 
+type UpdateUserRequest struct {
+	Phone          string
+	Age            int
+	Gender         bool
+	Marital_status bool
+	Photo          string
+}
+
 func HashPassword(password string) string {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
@@ -187,4 +195,27 @@ func DeleteUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, "Deleted user")
+}
+
+func UpdateUser(c *gin.Context) {
+	userId := c.Param("id")
+	userId = strings.ReplaceAll(userId, "/", "")
+	userIdInt, err := strconv.Atoi(userId)
+
+	var jsonBody UpdateUserRequest
+	c.BindJSON(&jsonBody)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	query := "UPDATE users SET phone = ?, age = ?, gender = ?, photo = ?, marital_status = ? WHERE id = ?"
+	_, err = db.Exec(query, jsonBody.Phone, jsonBody.Age, jsonBody.Gender, jsonBody.Photo, jsonBody.Marital_status, userIdInt)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "Pass"})
 }
