@@ -36,7 +36,7 @@ func main() {
 
 	server.POST("/api/upload", imageUpload)
 
-	server.GET("/api", func(ctx *gin.Context) {
+	server.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(200, "hye!!!")
 	})
 
