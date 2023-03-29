@@ -32,6 +32,7 @@ func main() {
 	routes.ReviewRoutes(server)
 	routes.RequestRoutes(server)
 	routes.SavedRoutes(server)
+	routes.ImageRoutes(server)
 
 	server.POST("/api/upload", imageUpload)
 
