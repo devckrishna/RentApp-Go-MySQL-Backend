@@ -65,7 +65,7 @@ func GetUsers(c *gin.Context) {
 
 	for res.Next() {
 		var user models.User
-		err := res.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Password, &user.Age, &user.Gender, &user.Marital_status, &user.Photo, &user.Is_host)
+		err := res.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Age, &user.Gender, &user.Marital_status, &user.Photo, &user.Is_host, &user.Phone)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
@@ -86,7 +86,7 @@ func GetUserById(c *gin.Context) {
 
 	var user models.User
 	query := "SELECT * FROM users WHERE id = ?"
-	err = db.QueryRow(query, userIdInt).Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Password, &user.Age, &user.Gender, &user.Marital_status, &user.Photo, &user.Is_host)
+	err = db.QueryRow(query, userIdInt).Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Age, &user.Gender, &user.Marital_status, &user.Photo, &user.Is_host, &user.Phone)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
@@ -126,7 +126,7 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 	query := "SELECT * FROM users WHERE email = ?"
-	err = db.QueryRow(query, request.Email).Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Password, &user.Age, &user.Gender, &user.Marital_status, &user.Photo, &user.Is_host)
+	err = db.QueryRow(query, request.Email).Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Age, &user.Gender, &user.Marital_status, &user.Photo, &user.Is_host, &user.Phone)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
