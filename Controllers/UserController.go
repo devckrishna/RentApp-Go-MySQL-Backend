@@ -96,12 +96,22 @@ func GetUserById(c *gin.Context) {
 
 func SignUp(c *gin.Context) {
 	var newUser models.User
+	var user models.User
 	err := c.BindJSON(&newUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 	newUser.Password = HashPassword(newUser.Password)
+
+	queryCheck := "SELECT * FROM users WHERE email = ?"
+	err = db.QueryRow(queryCheck, newUser.Email).Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Age, &user.Gender, &user.Marital_status, &user.Photo, &user.Is_host, &user.Phone)
+
+	if user.Email == newUser.Email {
+		c.JSON(500, gin.H{"error": "Email Already Exisits"})
+		return
+	}
+
 	query := "INSERT INTO users (name, email, password) VALUES (?, ?, ?)"
 	res, err := db.Exec(query, newUser.Name, newUser.Email, newUser.Password)
 	if err != nil {
