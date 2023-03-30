@@ -103,7 +103,7 @@ func GetPropertiesNearYou(c *gin.Context) {
 	var property models.Property
 	properties := []models.Property{}
 	query := `SELECT * FROM property WHERE City = ?`
-	res, err := db.Query(query)
+	res, err := db.Query(query, cityName)
 
 	defer res.Close()
 
