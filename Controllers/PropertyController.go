@@ -100,7 +100,6 @@ func GetPropertiesNearYou(c *gin.Context) {
 	cityName := c.Param("city")
 	cityName = strings.ReplaceAll(cityName, "/", "")
 
-	var property models.Property
 	properties := []models.Property{}
 	query := `SELECT * FROM property WHERE City = ?`
 	res, err := db.Query(query, cityName)
@@ -120,7 +119,7 @@ func GetPropertiesNearYou(c *gin.Context) {
 		}
 		properties = append(properties, property)
 	}
-	c.JSON(http.StatusOK, gin.H{"property": property})
+	c.JSON(http.StatusOK, gin.H{"properties": properties})
 }
 
 func GetHostPropertiesByUser(c *gin.Context) {
